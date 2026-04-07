@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "homepage": "https://elkamohammad1988.github.io/Todo-List",
+  "homepage": "https://elkamohammad1988.github.io/Todo-list-app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
