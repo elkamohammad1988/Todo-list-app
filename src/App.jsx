@@ -50,7 +50,7 @@ function App() {
           element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["admin"]}>
-                <Profile />
+                <Profile dark={dark} />
               </RoleRoute>
             </ProtectedRoute>
           }
@@ -61,7 +61,7 @@ function App() {
           element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["admin"]}>
-                <Settings />
+                <Settings dark={dark} />
               </RoleRoute>
             </ProtectedRoute>
           }
@@ -71,7 +71,7 @@ function App() {
           path="/upgrade"
           element={
             <ProtectedRoute>
-              <Upgrade />
+              <Upgrade dark={dark} />
             </ProtectedRoute>
           }
         />

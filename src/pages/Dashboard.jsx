@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { db, auth } from "../firebase";
 import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -22,6 +22,28 @@ export default function Dashboard({ dark, toggleDark }) {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  const sectionRefs = useRef([]);
+
+  // Animate sections on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    sectionRefs.current.forEach((ref) => ref && observer.observe(ref));
+    return () => {
+      sectionRefs.current.forEach((ref) => ref && observer.unobserve(ref));
+    };
+  }, []);
+
+  // Fetch user plan
   useEffect(() => {
     async function fetchPlan() {
       const userPlan = await getUserPlan();
@@ -30,6 +52,7 @@ export default function Dashboard({ dark, toggleDark }) {
     fetchPlan();
   }, []);
 
+  // Fetch todos from Firebase
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -48,6 +71,7 @@ export default function Dashboard({ dark, toggleDark }) {
     return () => unsubscribeAuth();
   }, [setTodos]);
 
+  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(timer);
@@ -75,16 +99,12 @@ export default function Dashboard({ dark, toggleDark }) {
     };
     addTodo(newTodo);
     await addDoc(collection(db, "todos"), newTodo);
+    // Save to LocalStorage as backup
+    localStorage.setItem("todos", JSON.stringify([...todos, newTodo]));
   }
 
   return (
-    <div
-      className={`
-        flex min-h-screen flex-col md:flex-row
-        transition-colors duration-300
-        ${dark ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}
-      `}
-    >
+    <div className={`flex min-h-screen flex-col md:flex-row transition-colors duration-300 ${dark ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
       <div className={`${sidebarOpen ? "w-64" : "w-20"} transition-all duration-300`}>
         <Sidebar collapsed={!sidebarOpen} dark={dark} />
       </div>
@@ -109,56 +129,23 @@ export default function Dashboard({ dark, toggleDark }) {
             mx-auto p-6 space-y-8
           "
         >
-          <StatsPanel todos={todos} />
-
-          <div
-            className="
-              p-6
-              bg-white dark:bg-slate-900
-              rounded-2xl
-              shadow hover:shadow-lg transition
-            "
-          >
-            <StatsChart todos={todos} />
-          </div>
-
-          <div
-            className="
-              p-6
-              bg-white dark:bg-slate-900
-              rounded-2xl
-              shadow hover:shadow-lg transition
-            "
-          >
-            <CalendarView todos={todos} />
-          </div>
-
-          <div
-            className="
-              min-h-[300px]
-              p-6
-              bg-white dark:bg-slate-900
-              rounded-2xl
-              shadow hover:shadow-lg transition
-            "
-          >
-            {loading ? <p
-              className="
-                text-center text-gray-500 dark:text-gray-400
-              "
-            >Loading...</p> : <TodoList todos={filteredTodos} />}
-          </div>
-
-          <div
-            className="
-              p-6
-              bg-white dark:bg-slate-900
-              rounded-2xl
-              shadow hover:shadow-lg transition
-            "
-          >
-            <TodoInput addTodo={handleAddTodo} />
-          </div>
+          {[StatsPanel, StatsChart, CalendarView, TodoList, TodoInput].map((Component, i) => (
+            <div
+              key={i}
+              ref={(el) => (sectionRefs.current[i] = el)}
+              className="hidden p-6 bg-white dark:bg-slate-900 rounded-2xl shadow hover:shadow-lg transition"
+            >
+              {i === 0 && <StatsPanel todos={todos} />}
+              {i === 1 && <StatsChart todos={todos} />}
+              {i === 2 && <CalendarView todos={todos} />}
+              {i === 3 && (loading ? <p
+                className="
+                  text-center text-gray-500 dark:text-gray-400
+                "
+              >Loading...</p> : <TodoList todos={filteredTodos} />)}
+              {i === 4 && <TodoInput addTodo={handleAddTodo} />}
+            </div>
+          ))}
         </div>
       </div>
     </div>

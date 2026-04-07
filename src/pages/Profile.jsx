@@ -1,32 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { auth } from "../firebase";
 import { updateProfile } from "firebase/auth";
 
-export default function Profile() {
+export default function Profile({ dark }) {
   const [name, setName] = useState("");
+  const containerRef = useRef(null);
 
+  // Scroll Animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) entry.target.classList.add("show");
+      },
+      { threshold: 0.2 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => containerRef.current && observer.unobserve(containerRef.current);
+  }, []);
+
+  // Load initial name
   useEffect(() => {
     if (auth.currentUser) {
       setName(auth.currentUser.displayName || "");
     }
+    const savedName = localStorage.getItem("profileName");
+    if (savedName) setName(savedName);
   }, []);
+
+  // Save name locally
+  useEffect(() => {
+    localStorage.setItem("profileName", name);
+  }, [name]);
 
   async function handleSave() {
     if (!auth.currentUser) return;
 
-    await updateProfile(auth.currentUser, {
-      displayName: name,
-    });
-
+    await updateProfile(auth.currentUser, { displayName: name });
     alert("Profile updated successfully!");
   }
 
   return (
     <div
-      className="
-        max-w-xl
-        p-10 mx-auto
-      "
+      ref={containerRef}
+      className={`hidden max-w-xl p-10 mx-auto transition-all duration-500 ${
+        dark ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
+      } rounded-2xl shadow`}
     >
       <h1
         className="
@@ -45,7 +63,7 @@ export default function Profile() {
           placeholder="Your Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-3 border rounded-lg"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
 
         <button
@@ -53,8 +71,10 @@ export default function Profile() {
           className="
             px-6 py-2
             text-white
-            bg-indigo-600
+            bg-indigo-600 hover:bg-indigo-500
             rounded-lg
+            transition-all
+            transform hover:scale-105
           "
         >
           Save Changes
