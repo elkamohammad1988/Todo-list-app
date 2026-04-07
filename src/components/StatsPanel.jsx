@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import { motion } from "framer-motion";
 
 export default function StatsPanel({ todos }) {
@@ -6,9 +6,7 @@ export default function StatsPanel({ todos }) {
   const completed = todos.filter((t) => t.done).length;
   const pending = total - completed;
 
-  const completionRate =
-    total === 0 ? 0 : Math.round((completed / total) * 100);
-
+  const completionRate = total === 0 ? 0 : Math.round((completed / total) * 100);
   const productivity = total === 0 ? 0 : Math.min(100, completionRate + 5);
 
   const stats = [
@@ -22,7 +20,7 @@ export default function StatsPanel({ todos }) {
   return (
     <div
       className="
-        grid grid-cols-1 md:grid-cols-5
+        grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5
         w-full
         gap-4
       "
@@ -38,22 +36,19 @@ export default function StatsPanel({ todos }) {
             p-4
             bg-white dark:bg-gray-800
             rounded-2xl
-            shadow
+            shadow hover:shadow-lg transition
           "
         >
           <p
             className="
-              text-sm text-gray-500
+              text-sm text-gray-500 dark:text-gray-400
             "
           >{item.label}</p>
-
           <p
             className="
               text-2xl text-indigo-600 dark:text-indigo-400 font-bold
             "
-          >
-            {item.value}
-          </p>
+          >{item.value}</p>
         </motion.div>
       ))}
     </div>

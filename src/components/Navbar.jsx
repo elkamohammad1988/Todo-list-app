@@ -3,14 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { FiLogOut, FiMoon, FiSun, FiMenu, FiSearch, FiX } from "react-icons/fi";
 
-export default function Navbar({
-  dark,
-  toggleDark,
-  toggleSidebar,
-  search,
-  setSearch,
-  plan, 
-}) {
+export default function Navbar({ dark, toggleDark, toggleSidebar, search, setSearch, plan }) {
   const navigate = useNavigate();
 
   async function logout() {
@@ -21,15 +14,12 @@ export default function Navbar({
 
   return (
     <div
-      className="
-        flex items-center justify-between
-        px-6 py-4
-        text-white
-        bg-gray-800 dark:bg-gray-700
-        shadow-md
-      "
+      className={`
+        flex items-center justify-between px-6 py-4 shadow-md
+        transition-colors duration-300
+        ${dark ? "bg-gray-800 text-white" : "bg-white text-black"}
+      `}
     >
-      {/* LEFT SIDE */}
       <div
         className="
           flex items-center
@@ -49,29 +39,21 @@ export default function Navbar({
             <FiMenu size={20} />
           </button>
         )}
-
         <h1
           className="
             font-bold text-xl
           "
         >Todo Dashboard</h1>
-
-        {/* Plan Badge */}
-        {plan && (
-          <span
-            className="
-              px-2 py-1
-              text-xs
-              bg-indigo-600
-              rounded-full
-            "
-          >
-            {plan.toUpperCase()}
-          </span>
-        )}
+        {plan && <span
+          className="
+            px-2 py-1
+            text-xs
+            bg-indigo-600
+            rounded-full
+          "
+        >{plan.toUpperCase()}</span>}
       </div>
 
-      {/* CENTER SEARCH */}
       <div
         className="
           relative hidden md:block
@@ -84,65 +66,44 @@ export default function Navbar({
             text-gray-400
             -translate-y-1/2
           "
-          size={16}
-        /
+          size={16} /
         >
-
         <input
           type="text"
           placeholder="Search tasks..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="
-            w-full
-            pl-9 pr-9 py-2
-            rounded-lg
-            bg-gray-100 dark:bg-gray-800
-            text-black dark:text-white
+          className={`
+            w-full pl-9 pr-9 py-2 rounded-lg transition
+            ${dark ? "bg-gray-700 text-white placeholder-gray-400" : "bg-gray-100 text-black placeholder-gray-600"}
             focus:outline-none
-          "
+          `}
         />
-
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="
-              absolute right-3 top-1/2
-              -translate-y-1/2
-              text-gray-400
-              hover:text-red-500
-            "
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
           >
             <FiX size={16} />
           </button>
         )}
       </div>
 
-      {/* RIGHT SIDE */}
       <div
         className="
           flex items-center
           gap-4
         "
       >
-        {/* Upgrade Button */}
         {plan === "free" && (
           <button
             onClick={() => navigate("/upgrade")}
-            className="
-              px-3 py-2
-              bg-indigo-600
-              hover:bg-indigo-700
-              rounded
-              transition
-              text-sm
-            "
+            className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm transition"
           >
             Upgrade
           </button>
         )}
 
-        {/* Dark Mode */}
         <button
           onClick={toggleDark}
           className="
@@ -155,7 +116,6 @@ export default function Navbar({
           {dark ? <FiSun size={20} /> : <FiMoon size={20} />}
         </button>
 
-        {/* Logout */}
         <button
           onClick={logout}
           className="
@@ -167,8 +127,7 @@ export default function Navbar({
             gap-2
           "
         >
-          <FiLogOut size={18} />
-          Logout
+          <FiLogOut size={18} /> Logout
         </button>
       </div>
     </div>

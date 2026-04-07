@@ -40,13 +40,13 @@ export default function Register() {
         flex items-center justify-center
         min-h-screen
         p-4
-        bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500
+        bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500
       "
     >
       <div
         className="
           w-full max-w-lg
-          p-10
+          p-8 sm:p-10
           bg-white/20
           border border-white/30 rounded-3xl
           backdrop-blur-2xl shadow-2xl
@@ -55,7 +55,7 @@ export default function Register() {
         <h1
           className="
             mb-8
-            text-4xl text-center text-white font-bold
+            text-3xl text-white text-center sm:text-4xl font-bold
           "
         >
           Create Account 🚀
@@ -70,7 +70,7 @@ export default function Register() {
           {/* Names */}
           <div
             className="
-              grid grid-cols-2
+              grid grid-cols-1 sm:grid-cols-2
               gap-4
             "
           >
@@ -82,7 +82,6 @@ export default function Register() {
               className="inputStyle"
               required
             />
-
             <input
               type="text"
               placeholder="Last Name"
@@ -93,6 +92,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Email & Phone */}
           <input
             type="email"
             placeholder="Email"
@@ -124,10 +124,9 @@ export default function Register() {
               className="inputStyle pr-12"
               required
             />
-
             <div
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-3 cursor-pointer text-gray-600 hover:scale-110 transition"
+              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
             >
               {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </div>
@@ -147,10 +146,9 @@ export default function Register() {
               className="inputStyle pr-12"
               required
             />
-
             <div
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-3 cursor-pointer text-gray-600 hover:scale-110 transition"
+              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
             >
               {showConfirmPassword ? (
                 <FaEyeSlash size={20} />
@@ -169,7 +167,7 @@ export default function Register() {
               text-purple-700 font-bold
               bg-white hover:bg-gray-100
               rounded-xl
-              transition shadow-lg
+              shadow-lg transition
             "
           >
             Register
@@ -198,12 +196,12 @@ export default function Register() {
       <style>{`
         .inputStyle {
           width: 100%;
-          padding: 12px;
+          padding: 12px 16px;
           border-radius: 12px;
           background: rgba(255,255,255,0.9);
           border: none;
           outline: none;
-          transition: 0.3s;
+          transition: all 0.3s;
         }
 
         .inputStyle:focus {

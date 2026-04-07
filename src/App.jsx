@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useState, useLayoutEffect } from "react";
 
 import Landing from "./pages/Landing";
@@ -16,37 +16,35 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [dark, setDark] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
+  const [dark, setDark] = useState(
+    () => localStorage.getItem("theme") === "dark",
+  );
 
   useLayoutEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("theme", dark ? "dark" : "light");
+    document.documentElement.style.transition =
+      "background-color 0.3s, color 0.3s";
   }, [dark]);
 
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Pages */}
-        <Route path="/" element={<Landing/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/register" element={<Register/>} />
+  const toggleDark = () => setDark((prev) => !prev);
 
-        {/* Protected Dashboard */}
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard
-                dark={dark}
-                toggleDark={() => setDark((prev) => !prev)}
-              />
+              <Dashboard dark={dark} toggleDark={toggleDark} />
             </ProtectedRoute>
           }
         />
 
-        {/* Admin Only Pages */}
         <Route
           path="/profile"
           element={
@@ -69,7 +67,6 @@ function App() {
           }
         />
 
-        {/* Upgrade Page */}
         <Route
           path="/upgrade"
           element={
@@ -81,7 +78,7 @@ function App() {
       </Routes>
 
       <ToastContainer position="top-right" />
-    </BrowserRouter>
+    </>
   );
 }
 
