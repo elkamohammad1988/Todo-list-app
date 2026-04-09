@@ -1,4 +1,3 @@
-// App.jsx
 import { Routes, Route } from "react-router-dom";
 import { useState, useLayoutEffect, Suspense, lazy } from "react";
 import { ToastContainer } from "react-toastify";
@@ -8,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
 
-// Pages (lazy load for performance)
+// Pages (lazy load)
 const Landing = lazy(() => import("./pages/Landing"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -24,11 +23,9 @@ function App() {
   );
 
   useLayoutEffect(() => {
-    // Toggle dark class on <html>
     document.documentElement.classList.toggle("dark", dark);
-    // Persist theme in localStorage
     localStorage.setItem("theme", dark ? "dark" : "light");
-    // Smooth transition for theme change
+
     document.documentElement.style.transition =
       "background-color 0.3s, color 0.3s";
   }, [dark]);
@@ -37,16 +34,33 @@ function App() {
 
   return (
     <>
-      {/* Suspense shows fallback while lazy pages load */}
       <Suspense
         fallback={
           <div
-            className="
-          flex justify-center items-center
+        className="
+          flex flex-col justify-center items-center
           h-screen
+          bg-white dark:bg-gray-900
         "
-          >
-            Loading...
+      >
+            {/* Spinner */}
+            <div
+              className="
+                w-12 h-12
+                border-4 border-indigo-600 border-t-transparent rounded-full
+                animate-spin
+              "
+            ></div>
+
+            {/* Text */}
+            <p
+              className="
+                mt-4
+                text-indigo-600 dark:text-indigo-400 font-medium
+              "
+            >
+              Loading...
+            </p>
           </div>
         }
       >
