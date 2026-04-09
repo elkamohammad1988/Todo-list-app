@@ -1,18 +1,34 @@
-# Todo List App
+# 📝 Todo List Dashboard App
 
-A simple and interactive Todo List web application.
+A modern and responsive **Todo List application** built with **React, Vite, and TailwindCSS**.  
+The app allows users to manage their daily tasks through a simple and clean dashboard interface.
 
-## Features
-- Add tasks
-- Delete tasks
-- Mark tasks completed
-- LocalStorage support
-- Smooth animations
-- Dark mode
+---
 
-## Technologies
-- HTML5
-- CSS3/tailwindcss
-- JavaScript
+## 🚀 Live Demo
+Coming soon...
 
-## Live Demo
+---
+
+## 📌 Features
+
+✔ Add new tasks  
+✔ Edit existing tasks  
+✔ Delete tasks  
+✔ Mark tasks as completed  
+✔ Task dashboard view  
+✔ Responsive design  
+✔ Clean and modern UI  
+
+---
+
+## 🛠 Tech Stack
+
+- React
+- Vite
+- TailwindCSS
+- JavaScript (ES6)
+
+---
+
+## 📂 Project Structure

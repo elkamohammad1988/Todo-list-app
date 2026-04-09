@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { auth } from "../firebase";
 import { updateProfile } from "firebase/auth";
+import { toast } from "react-toastify";
 
 export default function Profile({ dark }) {
   const [name, setName] = useState("");
@@ -15,7 +16,8 @@ export default function Profile({ dark }) {
       { threshold: 0.2 }
     );
     if (containerRef.current) observer.observe(containerRef.current);
-    return () => containerRef.current && observer.unobserve(containerRef.current);
+    return () =>
+      containerRef.current && observer.unobserve(containerRef.current);
   }, []);
 
   // Load initial name
@@ -35,16 +37,20 @@ export default function Profile({ dark }) {
   async function handleSave() {
     if (!auth.currentUser) return;
 
-    await updateProfile(auth.currentUser, { displayName: name });
-    alert("Profile updated successfully!");
+    try {
+      await updateProfile(auth.currentUser, { displayName: name });
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error("Error updating profile: " + err.message);
+    }
   }
 
   return (
     <div
       ref={containerRef}
-      className={`hidden max-w-xl p-10 mx-auto transition-all duration-500 ${
+      className={`opacity-0 translate-y-10 transition-all duration-500 max-w-xl p-10 mx-auto rounded-2xl shadow ${
         dark ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-      } rounded-2xl shadow`}
+      }`}
     >
       <h1
         className="
@@ -63,7 +69,9 @@ export default function Profile({ dark }) {
           placeholder="Your Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+            dark ? "focus:ring-indigo-400 bg-gray-800 text-white" : "focus:ring-indigo-500 bg-white text-black"
+          }`}
         />
 
         <button

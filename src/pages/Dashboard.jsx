@@ -1,6 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { db, auth } from "../firebase";
-import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTodoStore } from "../store/useTodoStore";
 import { getUserPlan, isPro } from "../utils/plan";
@@ -14,110 +21,192 @@ import CalendarView from "../components/CalendarView";
 import StatsChart from "../components/StatsChart";
 
 export default function Dashboard({ dark, toggleDark }) {
-  const { todos, setTodos, addTodo } = useTodoStore();
-
+  const { todos, setTodos } = useTodoStore();
   const [plan, setPlan] = useState("free");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
   const sectionRefs = useRef([]);
 
-  // Animate sections on scroll
+  // Inject fade-in CSS
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      .fade-section {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .fade-section.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
+  // IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("show");
-          }
-        });
-      },
-      { threshold: 0.2 }
+      entries =>
+        entries.forEach(e =>
+          e.target.classList.toggle("show", e.isIntersecting)
+        ),
+      { threshold: 0.1 }
     );
-
-    sectionRefs.current.forEach((ref) => ref && observer.observe(ref));
-    return () => {
-      sectionRefs.current.forEach((ref) => ref && observer.unobserve(ref));
-    };
+    sectionRefs.current.forEach(ref => ref && observer.observe(ref));
+    return () => sectionRefs.current.forEach(ref => ref && observer.unobserve(ref));
   }, []);
 
   // Fetch user plan
   useEffect(() => {
-    async function fetchPlan() {
-      const userPlan = await getUserPlan();
-      setPlan(userPlan);
-    }
-    fetchPlan();
+    (async () => {
+      try {
+        setPlan(await getUserPlan());
+      } catch (err) {
+        console.error("Failed to fetch user plan:", err);
+      }
+    })();
   }, []);
 
-  // Fetch todos from Firebase
+  // Auth + Firestore
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    let unsubscribeSnapshot = () => {};
+    const unsubscribeAuth = onAuthStateChanged(auth, user => {
+      unsubscribeSnapshot();
       if (!user) {
         setTodos([]);
         setLoading(false);
         return;
       }
       const q = query(collection(db, "todos"), where("userId", "==", user.uid));
-      const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-        const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setTodos(list);
-        setLoading(false);
-      });
-      return () => unsubscribeSnapshot();
+      unsubscribeSnapshot = onSnapshot(
+        q,
+        snap => {
+          setTodos(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+          setLoading(false);
+        },
+        err => console.error("Firestore error:", err)
+      );
     });
-    return () => unsubscribeAuth();
+    return () => {
+      unsubscribeAuth();
+      unsubscribeSnapshot();
+    };
   }, [setTodos]);
 
-  // Debounced search
+  // Debounce search
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
   }, [search]);
 
   const filteredTodos = useMemo(
-    () => todos.filter((todo) => todo.task.toLowerCase().includes(debouncedSearch.toLowerCase())),
+    () =>
+      todos.filter(
+        t =>
+          t.task &&
+          t.task.toLowerCase().includes(debouncedSearch.toLowerCase())
+      ),
     [todos, debouncedSearch]
   );
 
   async function handleAddTodo(task, time, category) {
     if (!task?.trim() || !auth.currentUser) return;
+
     if (!isPro(plan) && todos.length >= 5) {
       alert("Free plan limit reached. Upgrade to Pro 🚀");
       return;
     }
-    const newTodo = {
-      id: crypto.randomUUID(),
-      task,
-      time,
-      category,
-      done: false,
-      userId: auth.currentUser.uid,
-      createdAt: Date.now(),
-    };
-    addTodo(newTodo);
-    await addDoc(collection(db, "todos"), newTodo);
-    // Save to LocalStorage as backup
-    localStorage.setItem("todos", JSON.stringify([...todos, newTodo]));
+
+    try {
+      await addDoc(collection(db, "todos"), {
+        task,
+        time,
+        category,
+        done: false,
+        userId: auth.currentUser.uid,
+        createdAt: serverTimestamp(),
+        createdAtLocal: Date.now(),
+      });
+    } catch (err) {
+      console.error("Failed to add todo:", err);
+    }
   }
 
+  const sections = [
+    { comp: <StatsPanel todos={todos} dark={dark} /> },
+    { comp: <StatsChart todos={todos} dark={dark} /> },
+    { comp: <CalendarView todos={todos} dark={dark} /> },
+    {
+      comp: loading ? (
+        <div
+          className="
+            space-y-2
+            animate-pulse
+          "
+        >
+          <div
+            className="
+              h-4 w-3/4
+              bg-gray-700
+              rounded
+            "
+          ></div>
+          <div
+            className="
+              h-4 w-1/2
+              bg-gray-700
+              rounded
+            "
+          ></div>
+          <div
+            className="
+              h-4 w-5/6
+              bg-gray-700
+              rounded
+            "
+          ></div>
+        </div>
+      ) : (
+        <TodoList todos={filteredTodos} dark={dark} />
+      ),
+    },
+    { comp: <TodoInput addTodo={handleAddTodo} dark={dark} /> },
+  ];
+
   return (
-    <div className={`flex min-h-screen flex-col md:flex-row transition-colors duration-300 ${dark ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-      <div className={`${sidebarOpen ? "w-64" : "w-20"} transition-all duration-300`}>
+    <div
+      style={{ backgroundColor: dark ? "#0f1117" : "#f7f7f7" }}
+      className="
+        flex
+        min-h-screen
+        text-white
+      "
+    >
+      {/* Sidebar */}
+      <div
+        style={{ width: sidebarOpen ? 220 : 64 }}
+        className="
+          flex-shrink-0 overflow-hidden
+          transition-all duration-300
+        "
+      >
         <Sidebar collapsed={!sidebarOpen} dark={dark} />
       </div>
 
+      {/* Main */}
       <div
         className="
-          flex-1 flex flex-col
+          flex-1 flex flex-col overflow-hidden
         "
       >
         <Navbar
           dark={dark}
           toggleDark={toggleDark}
-          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          toggleSidebar={() => setSidebarOpen(v => !v)}
           search={search}
           setSearch={setSearch}
           plan={plan}
@@ -125,25 +214,23 @@ export default function Dashboard({ dark, toggleDark }) {
 
         <div
           className="
-            max-w-7xl
-            mx-auto p-6 space-y-8
+            flex-1 overflow-y-auto
+            p-5 space-y-4
           "
         >
-          {[StatsPanel, StatsChart, CalendarView, TodoList, TodoInput].map((Component, i) => (
+          {sections.map(({ comp }, i) => (
             <div
               key={i}
-              ref={(el) => (sectionRefs.current[i] = el)}
-              className="hidden p-6 bg-white dark:bg-slate-900 rounded-2xl shadow hover:shadow-lg transition"
+              ref={el => (sectionRefs.current[i] = el)}
+              className={`fade-section p-5 rounded-2xl transition-colors duration-300`}
+              style={{
+                backgroundColor: dark ? "#171b26" : "#ffffff",
+                border: dark
+                  ? "1px solid rgba(255,255,255,0.07)"
+                  : "1px solid rgba(0,0,0,0.07)",
+              }}
             >
-              {i === 0 && <StatsPanel todos={todos} />}
-              {i === 1 && <StatsChart todos={todos} />}
-              {i === 2 && <CalendarView todos={todos} />}
-              {i === 3 && (loading ? <p
-                className="
-                  text-center text-gray-500 dark:text-gray-400
-                "
-              >Loading...</p> : <TodoList todos={filteredTodos} />)}
-              {i === 4 && <TodoInput addTodo={handleAddTodo} />}
+              {comp}
             </div>
           ))}
         </div>

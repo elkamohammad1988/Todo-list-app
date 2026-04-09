@@ -23,7 +23,7 @@ export default function TodoPage({ dark, toggleDark }) {
 
     const q = query(
       collection(db, "todos"),
-      where("userId", "==", auth.currentUser.uid),
+      where("userId", "==", auth.currentUser.uid)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -53,17 +53,16 @@ export default function TodoPage({ dark, toggleDark }) {
 
   // Search Filter
   const filteredTodos = todos.filter((todo) =>
-    todo.task.toLowerCase().includes(search.toLowerCase()),
+    todo.task.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div
-      className="
-        min-h-screen
-        bg-linear-to-br from-blue-100 dark:from-gray-900
-        to-purple-200 dark:to-gray-800
-        transition-colors duration-300
-      "
+      className={`min-h-screen transition-colors duration-300 ${
+        dark
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
+          : "bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100"
+      }`}
     >
       <Navbar dark={dark} toggleDark={toggleDark} />
 
@@ -82,14 +81,18 @@ export default function TodoPage({ dark, toggleDark }) {
           placeholder="Search tasks..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-3 mb-4 border rounded-xl focus:ring-2 focus:ring-blue-400 transition"
+          className={`w-full p-3 mb-4 rounded-xl focus:outline-none focus:ring-2 transition ${
+            dark
+              ? "bg-gray-800 text-white border-gray-700 focus:ring-indigo-500"
+              : "bg-white text-gray-900 border-gray-200 focus:ring-blue-400"
+          }`}
         />
 
         {/* Add Task */}
-        <TodoInput addTodo={addTodo} />
+        <TodoInput addTodo={addTodo} dark={dark} />
 
         {/* Todo List */}
-        <TodoList todos={filteredTodos} />
+        <TodoList todos={filteredTodos} dark={dark} />
       </div>
     </div>
   );

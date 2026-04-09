@@ -3,7 +3,14 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { FiLogOut, FiMoon, FiSun, FiMenu, FiSearch, FiX } from "react-icons/fi";
 
-export default function Navbar({ dark, toggleDark, toggleSidebar, search, setSearch, plan }) {
+export default function Navbar({
+  dark,
+  toggleDark,
+  toggleSidebar,
+  search,
+  setSearch,
+  plan,
+}) {
   const navigate = useNavigate();
 
   async function logout() {
@@ -12,122 +19,172 @@ export default function Navbar({ dark, toggleDark, toggleSidebar, search, setSea
     navigate("/");
   }
 
+  const iconBtn = {
+    padding: "8px",
+    borderRadius: "8px",
+    background: "transparent",
+    border: "1px solid transparent",
+    color: dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
+    cursor: "pointer",
+    transition: "background 0.15s, color 0.15s, border-color 0.15s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
     <div
-      className={`
-        flex items-center justify-between px-6 py-4 shadow-md
-        transition-colors duration-300
-        ${dark ? "bg-gray-800 text-white" : "bg-white text-black"}
-      `}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "12px 24px",
+        backgroundColor: dark ? "#171b26" : "#ffffff",
+        borderBottom: dark
+          ? "1px solid rgba(255,255,255,0.07)"
+          : "1px solid rgba(0,0,0,0.07)",
+      }}
     >
-      <div
-        className="
-          flex items-center
-          gap-4
-        "
-      >
+      {/* Left */}
+      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
         {toggleSidebar && (
-          <button
-            onClick={toggleSidebar}
-            className="
-              p-2
-              hover:bg-gray-600
-              rounded
-              transition
-            "
-          >
-            <FiMenu size={20} />
+          <button onClick={toggleSidebar} style={iconBtn}>
+            <FiMenu size={18} />
           </button>
         )}
+
         <h1
-          className="
-            font-bold text-xl
-          "
-        >Todo Dashboard</h1>
-        {plan && <span
-          className="
-            px-2 py-1
-            text-xs
-            bg-indigo-600
-            rounded-full
-          "
-        >{plan.toUpperCase()}</span>}
+          style={{
+            fontSize: "15px",
+            fontWeight: 600,
+            color: dark ? "rgba(255,255,255,0.8)" : "#111",
+            letterSpacing: "0.03em",
+            margin: 0,
+          }}
+        >
+          Todo Dashboard
+        </h1>
+
+        {plan && (
+          <span
+            style={{
+              padding: "3px 10px",
+              fontSize: "11px",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              color: "#7f77dd",
+              backgroundColor: "rgba(127,119,221,0.15)",
+              border: "1px solid rgba(127,119,221,0.3)",
+              borderRadius: "20px",
+              textTransform: "uppercase",
+            }}
+          >
+            {plan}
+          </span>
+        )}
       </div>
 
-      <div
-        className="
-          relative hidden md:block
-          w-64
-        "
-      >
+      {/* Search */}
+      <div style={{ position: "relative", width: "240px" }}>
         <FiSearch
-          className="
-            absolute left-3 top-1/2
-            text-gray-400
-            -translate-y-1/2
-          "
-          size={16} /
-        >
+          size={14}
+          style={{
+            position: "absolute",
+            left: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+            pointerEvents: "none",
+          }}
+        />
+
         <input
           type="text"
           placeholder="Search tasks..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className={`
-            w-full pl-9 pr-9 py-2 rounded-lg transition
-            ${dark ? "bg-gray-700 text-white placeholder-gray-400" : "bg-gray-100 text-black placeholder-gray-600"}
-            focus:outline-none
-          `}
+          style={{
+            width: "100%",
+            paddingLeft: "34px",
+            paddingRight: search ? "34px" : "12px",
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            borderRadius: "10px",
+            backgroundColor: dark
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(0,0,0,0.05)",
+            border: dark
+              ? "1px solid rgba(255,255,255,0.07)"
+              : "1px solid rgba(0,0,0,0.1)",
+            color: dark ? "rgba(255,255,255,0.8)" : "#111",
+            fontSize: "13px",
+            outline: "none",
+            boxSizing: "border-box",
+          }}
         />
+
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              color: dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+              cursor: "pointer",
+              padding: 0,
+              display: "flex",
+            }}
           >
-            <FiX size={16} />
+            <FiX size={14} />
           </button>
         )}
       </div>
 
-      <div
-        className="
-          flex items-center
-          gap-4
-        "
-      >
+      {/* Right */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         {plan === "free" && (
           <button
             onClick={() => navigate("/upgrade")}
-            className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm transition"
+            style={{
+              padding: "7px 14px",
+              fontSize: "12px",
+              fontWeight: 600,
+              color: "#7f77dd",
+              backgroundColor: "rgba(127,119,221,0.15)",
+              border: "1px solid rgba(127,119,221,0.3)",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
           >
             Upgrade
           </button>
         )}
 
-        <button
-          onClick={toggleDark}
-          className="
-            p-2
-            hover:bg-gray-600
-            rounded
-            transition
-          "
-        >
-          {dark ? <FiSun size={20} /> : <FiMoon size={20} />}
+        <button onClick={toggleDark} style={iconBtn}>
+          {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
         </button>
 
         <button
           onClick={logout}
-          className="
-            flex items-center
-            px-3 py-2
-            bg-red-600 hover:bg-red-700
-            rounded
-            transition
-            gap-2
-          "
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "7px 14px",
+            fontSize: "12px",
+            fontWeight: 600,
+            color: "#e24b4a",
+            backgroundColor: "rgba(226,75,74,0.1)",
+            border: "1px solid rgba(226,75,74,0.25)",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
         >
-          <FiLogOut size={18} /> Logout
+          <FiLogOut size={15} /> Logout
         </button>
       </div>
     </div>

@@ -9,15 +9,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogin(e) {
     e.preventDefault();
+    setError("");
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
-    } catch (error) {
-      alert(error.message);
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -46,6 +48,15 @@ export default function Login() {
           "
         >Login</h1>
 
+        {/* Error Message */}
+        {error && (
+          <p
+            className="
+              text-red-500 text-center font-medium
+            "
+          >{error}</p>
+        )}
+
         {/* Email */}
         <input
           type="email"
@@ -73,6 +84,7 @@ export default function Login() {
           <div
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
           </div>
@@ -88,6 +100,7 @@ export default function Login() {
             bg-white hover:bg-gray-100
             rounded-xl
             shadow-lg transition
+            transform hover:scale-105
           "
         >
           Login

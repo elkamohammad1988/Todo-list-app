@@ -3,22 +3,29 @@ export default function StatsCard({ title, value }) {
     <div
       className="
         p-6
-        bg-white dark:bg-gray-800
+        bg-gray-800
         rounded-2xl
-        shadow-xl hover:shadow-2xl transition
+        shadow-lg hover:shadow-2xl transition-transform duration-300
+        transform
+        hover:-translate-y-1
       "
     >
       <h3
         className="
-          text-gray-500
+          text-gray-400 text-sm font-medium
         "
-      >{title}</h3>
+      >
+        {title}
+      </h3>
 
       <p
         className="
-          text-3xl font-bold
+          mt-2
+          text-white text-3xl font-bold
         "
-      >{value}</p>
+      >
+        {value}
+      </p>
     </div>
   );
 }

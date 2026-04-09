@@ -1,35 +1,39 @@
 import { useNavigate } from "react-router-dom";
 
-export default function Upgrade() {
+export default function Upgrade({ dark }) {
   const navigate = useNavigate();
 
   return (
     <div
-      className="
+      className={`
         flex items-center justify-center
         min-h-screen
         p-6
-        bg-slate-100 dark:bg-slate-950
-      "
+        transition-colors duration-300
+        ${dark ? "bg-slate-950" : "bg-slate-100"}
+      `}
     >
       <div
-        className="
+        className={`
           max-w-3xl w-full
           p-10 space-y-8
-          bg-white dark:bg-slate-900
+          transition-colors duration-300
+          ${dark ? "bg-gray-900 text-gray-200" : "bg-white text-gray-900"}
           rounded-2xl
           shadow-xl
-        "
+        `}
       >
         <h1
           className="
             text-4xl text-center font-bold
           "
-        >Upgrade to Pro 🚀</h1>
+        >
+          Upgrade to Pro 🚀
+        </h1>
 
         <p
           className="
-            text-center text-gray-500
+            text-center text-gray-500 dark:text-gray-400
           "
         >
           Unlock unlimited productivity and premium features.
@@ -42,11 +46,14 @@ export default function Upgrade() {
             gap-6
           "
         >
+          {/* Free Plan */}
           <div
-            className="
+            className={`
               p-6 space-y-3
               border rounded-xl
-            "
+              transition-colors
+              ${dark ? "border-gray-700" : "border-gray-300"}
+            `}
           >
             <h2
               className="
@@ -56,7 +63,7 @@ export default function Upgrade() {
             <ul
               className="
                 pl-5 space-y-1
-                text-sm text-gray-500
+                text-sm text-gray-500 dark:text-gray-400
                 list-disc
               "
             >
@@ -66,21 +73,21 @@ export default function Upgrade() {
             </ul>
           </div>
 
+          {/* Pro Plan */}
           <div
-            className="
+            className={`
               p-6 space-y-3
-              border-2 border-indigo-600 rounded-xl
-            "
+              border-2 rounded-xl
+              ${dark ? "border-indigo-400" : "border-indigo-600"}
+            `}
           >
-            <h2
-              className="
-                text-xl text-indigo-600 font-semibold
-              "
-            >Pro Plan</h2>
+            <h2 className={`text-xl font-semibold ${dark ? "text-indigo-400" : "text-indigo-600"}`}>
+              Pro Plan
+            </h2>
             <ul
               className="
                 pl-5 space-y-1
-                text-sm
+                text-sm text-gray-700 dark:text-gray-200
                 list-disc
               "
             >
@@ -113,7 +120,7 @@ export default function Upgrade() {
         >
           <button
             onClick={() => navigate("/dashboard")}
-            className="text-sm text-gray-500 hover:underline"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
           >
             Back to Dashboard
           </button>

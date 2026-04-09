@@ -1,61 +1,69 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function Register() {
+export default function Register({ dark }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        alert(error.message);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Send email verification
+      await sendEmailVerification(userCredential.user);
+      toast.success("Verification email sent!");
+
+      // Save additional data to Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        firstName,
+        lastName,
+        phone,
+        role: "user",
+        createdAt: new Date(),
       });
+
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
 
   return (
     <div
-      className="
-        flex items-center justify-center
-        min-h-screen
-        p-4
-        bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500
-      "
+      className={`flex items-center justify-center min-h-screen p-4 ${
+        dark ? "bg-gray-900" : "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500"
+      }`}
     >
       <div
-        className="
-          w-full max-w-lg
-          p-8 sm:p-10
-          bg-white/20
-          border border-white/30 rounded-3xl
-          backdrop-blur-2xl shadow-2xl
-        "
+        className={`w-full max-w-lg p-8 sm:p-10 ${
+          dark ? "bg-gray-800 text-white" : "bg-white/20"
+        } border border-white/30 rounded-3xl backdrop-blur-2xl shadow-2xl`}
       >
         <h1
           className="
             mb-8
-            text-3xl text-white text-center sm:text-4xl font-bold
+            text-3xl text-center sm:text-4xl font-bold
           "
         >
           Create Account 🚀
@@ -79,7 +87,7 @@ export default function Register() {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="inputStyle"
+              className={`inputStyle ${dark ? "darkInput" : ""}`}
               required
             />
             <input
@@ -87,7 +95,7 @@ export default function Register() {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="inputStyle"
+              className={`inputStyle ${dark ? "darkInput" : ""}`}
               required
             />
           </div>
@@ -98,16 +106,15 @@ export default function Register() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="inputStyle"
+            className={`inputStyle ${dark ? "darkInput" : ""}`}
             required
           />
-
           <input
             type="tel"
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="inputStyle"
+            className={`inputStyle ${dark ? "darkInput" : ""}`}
           />
 
           {/* Password */}
@@ -121,12 +128,12 @@ export default function Register() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="inputStyle pr-12"
+              className={`inputStyle pr-12 ${dark ? "darkInput" : ""}`}
               required
             />
             <div
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
+              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-300 transition-transform hover:scale-110"
             >
               {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </div>
@@ -143,18 +150,14 @@ export default function Register() {
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="inputStyle pr-12"
+              className={`inputStyle pr-12 ${dark ? "darkInput" : ""}`}
               required
             />
             <div
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
+              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-300 transition-transform hover:scale-110"
             >
-              {showConfirmPassword ? (
-                <FaEyeSlash size={20} />
-              ) : (
-                <FaEye size={20} />
-              )}
+              {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </div>
           </div>
 
@@ -192,7 +195,7 @@ export default function Register() {
         </p>
       </div>
 
-      {/* Input Style */}
+      {/* Input Styles */}
       <style>{`
         .inputStyle {
           width: 100%;
@@ -202,10 +205,14 @@ export default function Register() {
           border: none;
           outline: none;
           transition: all 0.3s;
+          color: #111827;
         }
-
         .inputStyle:focus {
           box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+        }
+        .darkInput {
+          background: rgba(31,41,55,0.8);
+          color: #f9fafb;
         }
       `}</style>
     </div>

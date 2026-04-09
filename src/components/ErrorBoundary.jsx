@@ -1,12 +1,5 @@
 import React from "react";
 
-/*
-  Error Boundary Component
-  ------------------------
-  Catches JavaScript errors anywhere in the component tree
-  and displays a fallback UI instead of crashing the app.
-*/
-
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -21,24 +14,49 @@ export default class ErrorBoundary extends React.Component {
     console.error("Error caught by boundary:", error, info);
   }
 
+  handleRetry = () => {
+    this.setState({ hasError: false });
+    window.location.reload(); 
+  };
+
   render() {
     if (this.state.hasError) {
       return (
         <div
           className="
-            flex items-center justify-center
+            flex flex-col items-center justify-center
             min-h-screen
-            text-red-600
-            bg-red-50
+            p-6
+            text-red-600 dark:text-red-400
+            bg-red-50 dark:bg-gray-900
           "
         >
           <h1
             className="
-              text-xl font-bold
+              mb-4
+              text-2xl font-bold
+            "
+          >Oops! Something went wrong.</h1>
+          <p
+            className="
+              mb-6
+              text-center text-gray-700 dark:text-gray-300
             "
           >
-            Something went wrong.
-          </h1>
+            An unexpected error occurred. Please try again.
+          </p>
+          <button
+            onClick={this.handleRetry}
+            className="
+              px-4 py-2
+              text-white
+              bg-red-600 hover:bg-red-700
+              rounded-lg
+              transition
+            "
+          >
+            Retry
+          </button>
         </div>
       );
     }

@@ -7,8 +7,10 @@ export default function Landing() {
         min-h-screen
         bg-gradient-to-b from-indigo-50 dark:from-slate-900
         via-white dark:via-slate-950 to-white dark:to-slate-950
+        transition-colors
       "
     >
+      
       {/* Hero Section */}
       <div
         className="
@@ -56,7 +58,7 @@ export default function Landing() {
               text-white font-semibold
               bg-indigo-600 hover:bg-indigo-700
               rounded-lg
-              transition
+              transition shadow-md
               transform hover:scale-105
             "
           >
@@ -70,7 +72,7 @@ export default function Landing() {
               font-semibold
               hover:bg-gray-200 dark:hover:bg-gray-800
               border border-gray-300 dark:border-gray-600 rounded-lg
-              transition
+              transition shadow-sm
               transform hover:scale-105
             "
           >
@@ -84,6 +86,7 @@ export default function Landing() {
         className="
           py-20
           bg-white dark:bg-slate-900
+          transition-colors
         "
       >
         <div
@@ -95,77 +98,34 @@ export default function Landing() {
             gap-10
           "
         >
-          <div
-            className="
-              space-y-3 p-6
-              hover:bg-indigo-50 dark:hover:bg-slate-800
-              rounded-xl
-              transition
-            "
-          >
-            <h3
+          {[
+            { title: "Real-time Sync", desc: "Firestore live updates instantly." },
+            { title: "Free / Pro System", desc: "Subscription-ready architecture." },
+            { title: "Admin Ready", desc: "Role-based access control." },
+          ].map((feature, idx) => (
+            <div
+              key={idx}
               className="
-                text-xl text-indigo-600 dark:text-indigo-400 font-semibold
+                space-y-3 p-6
+                hover:bg-indigo-50 dark:hover:bg-slate-800
+                rounded-xl
+                transition shadow-sm hover:shadow-md
               "
             >
-              Real-time Sync
-            </h3>
-            <p
-              className="
-                text-gray-500 dark:text-gray-300
-              "
-            >
-              Firestore live updates instantly.
-            </p>
-          </div>
-
-          <div
-            className="
-              space-y-3 p-6
-              hover:bg-indigo-50 dark:hover:bg-slate-800
-              rounded-xl
-              transition
-            "
-          >
-            <h3
-              className="
-                text-xl text-indigo-600 dark:text-indigo-400 font-semibold
-              "
-            >
-              Free / Pro System
-            </h3>
-            <p
-              className="
-                text-gray-500 dark:text-gray-300
-              "
-            >
-              Subscription-ready architecture.
-            </p>
-          </div>
-
-          <div
-            className="
-              space-y-3 p-6
-              hover:bg-indigo-50 dark:hover:bg-slate-800
-              rounded-xl
-              transition
-            "
-          >
-            <h3
-              className="
-                text-xl text-indigo-600 dark:text-indigo-400 font-semibold
-              "
-            >
-              Admin Ready
-            </h3>
-            <p
-              className="
-                text-gray-500 dark:text-gray-300
-              "
-            >
-              Role-based access control.
-            </p>
-          </div>
+              <h3
+                className="
+                  text-xl text-indigo-600 dark:text-indigo-400 font-semibold
+                "
+              >
+                {feature.title}
+              </h3>
+              <p
+                className="
+                  text-gray-500 dark:text-gray-300
+                "
+              >{feature.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
