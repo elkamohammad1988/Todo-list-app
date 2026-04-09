@@ -5,12 +5,11 @@ export default function Landing() {
     <div
       className="
         min-h-screen
-        bg-gradient-to-b from-indigo-50 dark:from-slate-900
-        via-white dark:via-slate-950 to-white dark:to-slate-950
-        transition-colors
+        bg-white dark:bg-gray-900
+        transition
       "
     >
-      
+
       {/* Hero Section */}
       <div
         className="
@@ -21,7 +20,7 @@ export default function Landing() {
       >
         <h1
           className="
-            text-5xl sm:text-6xl font-bold leading-tight
+            text-5xl text-black dark:text-white sm:text-6xl font-bold
           "
         >
           Organize Your Work <br />
@@ -30,24 +29,25 @@ export default function Landing() {
             className="
               text-indigo-600 dark:text-indigo-400
             "
-          >Startup</span>
+          >
+            Startup
+          </span>
         </h1>
 
         <p
           className="
             max-w-2xl
             mx-auto
-            text-gray-500 dark:text-gray-300 text-lg sm:text-xl
+            text-gray-500 dark:text-gray-300 text-lg
           "
         >
-          A modern SaaS Todo App with authentication, roles, subscriptions,
-          analytics and real-time sync.
+          A modern SaaS Todo App with authentication, roles,
+          subscriptions, analytics and real-time sync.
         </p>
 
         <div
           className="
             flex flex-col sm:flex-row justify-center
-            mt-6
             gap-4
           "
         >
@@ -55,11 +55,10 @@ export default function Landing() {
             to="/register"
             className="
               px-8 py-3
-              text-white font-semibold
+              text-white
               bg-indigo-600 hover:bg-indigo-700
-              rounded-lg
-              transition shadow-md
-              transform hover:scale-105
+              rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500
+              transition
             "
           >
             Get Started
@@ -69,11 +68,10 @@ export default function Landing() {
             to="/login"
             className="
               px-8 py-3
-              font-semibold
-              hover:bg-gray-200 dark:hover:bg-gray-800
-              border border-gray-300 dark:border-gray-600 rounded-lg
-              transition shadow-sm
-              transform hover:scale-105
+              text-black dark:text-white
+              bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700
+              border border-gray-300 dark:border-gray-700 rounded-lg
+              transition
             "
           >
             Login
@@ -85,8 +83,6 @@ export default function Landing() {
       <div
         className="
           py-20
-          bg-white dark:bg-slate-900
-          transition-colors
         "
       >
         <div
@@ -99,17 +95,26 @@ export default function Landing() {
           "
         >
           {[
-            { title: "Real-time Sync", desc: "Firestore live updates instantly." },
-            { title: "Free / Pro System", desc: "Subscription-ready architecture." },
-            { title: "Admin Ready", desc: "Role-based access control." },
+            {
+              title: "Real-time Sync",
+              desc: "Firestore live updates instantly.",
+            },
+            {
+              title: "Free / Pro System",
+              desc: "Subscription-ready architecture.",
+            },
+            {
+              title: "Admin Ready",
+              desc: "Role-based access control.",
+            },
           ].map((feature, idx) => (
             <div
               key={idx}
               className="
-                space-y-3 p-6
-                hover:bg-indigo-50 dark:hover:bg-slate-800
-                rounded-xl
-                transition shadow-sm hover:shadow-md
+                p-6
+                bg-white dark:bg-gray-800
+                border border-gray-300 dark:border-gray-700 rounded-lg
+                transition hover:shadow-md
               "
             >
               <h3
@@ -119,15 +124,20 @@ export default function Landing() {
               >
                 {feature.title}
               </h3>
+
               <p
                 className="
+                  mt-2
                   text-gray-500 dark:text-gray-300
                 "
-              >{feature.desc}</p>
+              >
+                {feature.desc}
+              </p>
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 }

@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-export default function Register({ dark }) {
+export default function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -28,13 +31,15 @@ export default function Register({ dark }) {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
 
-      // Send email verification
       await sendEmailVerification(userCredential.user);
       toast.success("Verification email sent!");
 
-      // Save additional data to Firestore
       await setDoc(doc(db, "users", userCredential.user.uid), {
         firstName,
         lastName,
@@ -51,19 +56,26 @@ export default function Register({ dark }) {
 
   return (
     <div
-      className={`flex items-center justify-center min-h-screen p-4 ${
-        dark ? "bg-gray-900" : "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500"
-      }`}
+      className="
+        flex items-center justify-center
+        min-h-screen
+        p-4
+        bg-white dark:bg-gray-900
+      "
     >
       <div
-        className={`w-full max-w-lg p-8 sm:p-10 ${
-          dark ? "bg-gray-800 text-white" : "bg-white/20"
-        } border border-white/30 rounded-3xl backdrop-blur-2xl shadow-2xl`}
+        className="
+          w-full max-w-lg
+          p-8 space-y-5
+          bg-white dark:bg-gray-800
+          border border-gray-300 dark:border-gray-700 rounded-xl
+          shadow-md
+        "
       >
+        {/* Title */}
         <h1
           className="
-            mb-8
-            text-3xl text-center sm:text-4xl font-bold
+            text-3xl text-center text-black dark:text-white font-bold
           "
         >
           Create Account 🚀
@@ -72,14 +84,14 @@ export default function Register({ dark }) {
         <form
           onSubmit={handleRegister}
           className="
-            space-y-5
+            space-y-4
           "
         >
           {/* Names */}
           <div
             className="
               grid grid-cols-1 sm:grid-cols-2
-              gap-4
+              gap-3
             "
           >
             <input
@@ -87,34 +99,37 @@ export default function Register({ dark }) {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className={`inputStyle ${dark ? "darkInput" : ""}`}
+              className="input"
               required
             />
+
             <input
               type="text"
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className={`inputStyle ${dark ? "darkInput" : ""}`}
+              className="input"
               required
             />
           </div>
 
-          {/* Email & Phone */}
+          {/* Email */}
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`inputStyle ${dark ? "darkInput" : ""}`}
+            className="input"
             required
           />
+
+          {/* Phone */}
           <input
             type="tel"
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className={`inputStyle ${dark ? "darkInput" : ""}`}
+            className="input"
           />
 
           {/* Password */}
@@ -128,14 +143,15 @@ export default function Register({ dark }) {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`inputStyle pr-12 ${dark ? "darkInput" : ""}`}
+              className="input pr-10"
               required
             />
+
             <div
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-300 transition-transform hover:scale-110"
+              className="absolute right-3 top-3 text-gray-500 cursor-pointer"
             >
-              {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </div>
           </div>
 
@@ -150,44 +166,45 @@ export default function Register({ dark }) {
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`inputStyle pr-12 ${dark ? "darkInput" : ""}`}
+              className="input pr-10"
               required
             />
+
             <div
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-300 transition-transform hover:scale-110"
+              className="absolute right-3 top-3 text-gray-500 cursor-pointer"
             >
-              {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
             </div>
           </div>
 
-          {/* Register Button */}
+          {/* Button */}
           <button
             type="submit"
             className="
               w-full
-              py-3 mt-4
-              text-purple-700 font-bold
-              bg-white hover:bg-gray-100
-              rounded-xl
-              shadow-lg transition
+              py-3
+              text-white font-semibold
+              bg-indigo-600 hover:bg-indigo-700
+              rounded-lg focus:ring-2 focus:ring-indigo-400
+              transition
             "
           >
             Register
           </button>
         </form>
 
+        {/* Login link */}
         <p
           className="
-            mt-6
-            text-center text-white
+            text-center text-gray-500 dark:text-gray-300 text-sm
           "
         >
           Already have an account?{" "}
           <Link
             to="/"
             className="
-              font-semibold underline hover:text-gray-200
+              text-indigo-600 font-semibold hover:underline
             "
           >
             Login
@@ -195,24 +212,28 @@ export default function Register({ dark }) {
         </p>
       </div>
 
-      {/* Input Styles */}
+      {/* Shared input style */}
       <style>{`
-        .inputStyle {
+        .input {
           width: 100%;
-          padding: 12px 16px;
-          border-radius: 12px;
-          background: rgba(255,255,255,0.9);
-          border: none;
-          outline: none;
-          transition: all 0.3s;
+          padding: 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          background: white;
           color: #111827;
+          outline: none;
+          transition: all 0.2s;
         }
-        .inputStyle:focus {
-          box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+
+        .dark .input {
+          background: #1f2937;
+          border-color: #374151;
+          color: white;
         }
-        .darkInput {
-          background: rgba(31,41,55,0.8);
-          color: #f9fafb;
+
+        .input:focus {
+          border-color: #6366f1;
+          box-shadow: 0 0 0 2px rgba(99,102,241,0.3);
         }
       `}</style>
     </div>

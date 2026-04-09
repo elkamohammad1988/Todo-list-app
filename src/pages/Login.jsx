@@ -2,24 +2,35 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaGoogle, FaGithub } from "react-icons/fa";
 
 export default function Login() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
+      if (remember) {
+        localStorage.setItem("remember", "true");
+      }
+
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -29,32 +40,52 @@ export default function Login() {
         flex items-center justify-center
         min-h-screen
         p-4
-        bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500
+        bg-white dark:bg-gray-900
       "
     >
-      <form
-        onSubmit={handleLogin}
+      <div
         className="
           w-full max-w-md
           p-8 space-y-6
-          bg-white/20
-          border border-white/30 rounded-3xl
-          backdrop-blur-2xl shadow-2xl
+          bg-white dark:bg-gray-800
+          border border-gray-200 dark:border-gray-700 rounded-xl
+          shadow-md
         "
       >
-        <h1
+        {/* Logo */}
+        <div
           className="
-            text-3xl text-white text-center font-bold
+            space-y-2
+            text-center
           "
-        >Login</h1>
-
-        {/* Error Message */}
-        {error && (
+        >
+          <div
+            className="
+              text-3xl text-indigo-600 font-bold
+            "
+          >
+            Todo<span
+              className="
+                text-black dark:text-white
+              "
+            >Pro</span>
+          </div>
           <p
             className="
-              text-red-500 text-center font-medium
+              text-gray-500 dark:text-gray-300 text-sm
             "
-          >{error}</p>
+          >
+            Welcome back! Please login
+          </p>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div
+            className="
+              text-sm text-red-500 text-center
+            "
+          >{error}</div>
         )}
 
         {/* Email */}
@@ -63,8 +94,14 @@ export default function Login() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="inputStyle"
-          required
+          className="
+            w-full p-3
+            border border-gray-300 dark:border-gray-700
+            rounded-lg
+            bg-white dark:bg-gray-800
+            text-black dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-indigo-500
+          "
         />
 
         {/* Password */}
@@ -78,67 +115,149 @@ export default function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="inputStyle pr-12"
-            required
+            className="
+              w-full p-3 pr-12
+              border border-gray-300 dark:border-gray-700
+              rounded-lg
+              bg-white dark:bg-gray-800
+              text-black dark:text-white
+              focus:outline-none focus:ring-2 focus:ring-indigo-500
+            "
           />
+
           <div
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 cursor-pointer text-gray-600 hover:text-gray-800 transition-transform hover:scale-110"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-3 top-3 text-gray-500 cursor-pointer"
           >
-            {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
           </div>
         </div>
 
-        {/* Login Button */}
+        {/* Options */}
+        <div
+          className="
+            flex justify-between items-center
+            text-sm
+          "
+        >
+          <label
+            className="
+              flex items-center
+              text-gray-500
+              gap-2
+            "
+          >
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={() => setRemember(!remember)}
+            />
+            Remember me
+          </label>
+
+          <Link
+            to="/forgot-password"
+            className="
+              text-indigo-600 hover:underline
+            "
+          >
+            Forgot password?
+          </Link>
+        </div>
+
+        {/* Button */}
         <button
-          type="submit"
+          onClick={handleLogin}
+          disabled={loading}
           className="
             w-full
             py-3
-            text-purple-700 font-bold
-            bg-white hover:bg-gray-100
-            rounded-xl
-            shadow-lg transition
-            transform hover:scale-105
+            text-white font-semibold
+            bg-indigo-600 hover:bg-indigo-700
+            rounded-lg
+            transition disabled:opacity-50
           "
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p
+        {/* Divider */}
+        <div
           className="
-            text-center text-white
+            flex items-center
+            gap-3
           "
         >
-          Don't have an account?{" "}
+          <div
+            className="
+              flex-1
+              h-px
+              bg-gray-300 dark:bg-gray-700
+            "
+          ></div>
+          <span
+            className="
+              text-gray-400 text-sm
+            "
+          >OR</span>
+          <div
+            className="
+              flex-1
+              h-px
+              bg-gray-300 dark:bg-gray-700
+            "
+          ></div>
+        </div>
+
+        {/* Social Login */}
+        <div
+          className="
+            flex
+            gap-3
+          "
+        >
+          <button
+            className="
+              flex-1 flex items-center justify-center
+              p-2
+              hover:bg-gray-100 dark:hover:bg-gray-700
+              border rounded-lg
+              gap-2
+            "
+          >
+            <FaGoogle /> Google
+          </button>
+
+          <button
+            className="
+              flex-1 flex items-center justify-center
+              p-2
+              hover:bg-gray-100 dark:hover:bg-gray-700
+              border rounded-lg
+              gap-2
+            "
+          >
+            <FaGithub /> GitHub
+          </button>
+        </div>
+
+        {/* Register */}
+        <p
+          className="
+            text-center text-gray-500 text-sm
+          "
+        >
+          Don’t have an account?{" "}
           <Link
             to="/register"
             className="
-              font-semibold underline hover:text-gray-200
+              text-indigo-600 font-semibold
             "
           >
-            Register
+            Sign up
           </Link>
         </p>
-      </form>
-
-      {/* Input Style */}
-      <style>{`
-        .inputStyle {
-          width: 100%;
-          padding: 12px 16px;
-          border-radius: 12px;
-          background: rgba(255,255,255,0.9);
-          border: none;
-          outline: none;
-          transition: all 0.3s;
-        }
-
-        .inputStyle:focus {
-          box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-        }
-      `}</style>
+      </div>
     </div>
   );
 }
