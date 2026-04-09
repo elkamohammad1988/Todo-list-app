@@ -7,43 +7,39 @@ const CATEGORY_CONFIG = [
   { name: "Study", color: "#ef9f27" },
 ];
 
+// 🧠 Stat Card (unchanged logic, improved smoothness)
 const StatCard = memo(({ label, value, color, dark }) => (
   <div
     style={{
       flex: 1,
-      padding: "12px 10px",
-      borderRadius: "10px",
+      padding: "14px 12px",
+      borderRadius: "12px",
       backgroundColor: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
       border: dark
         ? "1px solid rgba(255,255,255,0.07)"
         : "1px solid rgba(0,0,0,0.07)",
       textAlign: "center",
+      transition: "all 0.3s ease",
     }}
   >
     <p
       style={{
         fontSize: "12px",
         color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-        margin: "0 0 4px",
+        margin: "0 0 6px",
       }}
     >
       {label}
     </p>
-    <p style={{ fontSize: "20px", fontWeight: 600, margin: 0, color }}>
+    <p style={{ fontSize: "22px", fontWeight: 700, margin: 0, color }}>
       {value}
     </p>
   </div>
 ));
 
+// 🧠 Legend (same logic, better spacing)
 const CustomLegend = memo(({ data, total, dark }) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "10px",
-      minWidth: "120px",
-    }}
-  >
+  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
     {data.map(({ name, value, color }) => (
       <div
         key={name}
@@ -51,8 +47,8 @@ const CustomLegend = memo(({ data, total, dark }) => (
       >
         <span
           style={{
-            width: 8,
-            height: 8,
+            width: 10,
+            height: 10,
             borderRadius: "50%",
             backgroundColor: color,
           }}
@@ -60,7 +56,7 @@ const CustomLegend = memo(({ data, total, dark }) => (
         <span
           style={{
             fontSize: 13,
-            color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
+            color: dark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)",
             flex: 1,
           }}
         >
@@ -69,11 +65,11 @@ const CustomLegend = memo(({ data, total, dark }) => (
         <span
           style={{
             fontSize: 13,
-            fontWeight: 500,
-            color: dark ? "rgba(255,255,255,0.75)" : "#111",
+            fontWeight: 600,
+            color: dark ? "rgba(255,255,255,0.85)" : "#111",
           }}
         >
-          {total > 0 ? Math.round((value / total) * 100) : 0}%
+          {total ? Math.round((value / total) * 100) : 0}%
         </span>
       </div>
     ))}
@@ -81,11 +77,16 @@ const CustomLegend = memo(({ data, total, dark }) => (
 ));
 
 export default function StatsChart({ todos = [], dark = true }) {
+  // 📊 data logic unchanged
   const data = useMemo(() => {
     const counts = { Work: 0, Personal: 0, Study: 0 };
+
     todos.forEach((todo) => {
-      if (counts[todo.category] !== undefined) counts[todo.category]++;
+      if (counts[todo.category] !== undefined) {
+        counts[todo.category]++;
+      }
     });
+
     return CATEGORY_CONFIG.map((c) => ({
       name: c.name,
       value: counts[c.name],
@@ -108,9 +109,11 @@ export default function StatsChart({ todos = [], dark = true }) {
           ? "1px solid rgba(255,255,255,0.07)"
           : "1px solid rgba(0,0,0,0.07)",
         backgroundColor: dark ? "#171b26" : "#ffffff",
+        transition: "all 0.3s ease",
       }}
     >
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+      {/* Top stats */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
         {data.map((d) => (
           <StatCard
             key={d.name}
@@ -122,10 +125,11 @@ export default function StatsChart({ todos = [], dark = true }) {
         ))}
       </div>
 
+      {/* Empty state */}
       {total === 0 ? (
         <div
           style={{
-            height: 240,
+            height: 260,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -140,38 +144,45 @@ export default function StatsChart({ todos = [], dark = true }) {
           No tasks to display
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div style={{ flex: 1, height: 240 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+          {/* ✅ FIX: stable chart container */}
+          <div
+            style={{
+              flex: 1,
+              minHeight: 260,
+              height: 260,
+            }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={data}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={3}
+                  innerRadius={65}
+                  outerRadius={105}
+                  paddingAngle={4}
+                  stroke="none"
                 >
                   {data.map((d) => (
                     <Cell key={d.name} fill={d.color} />
                   ))}
                 </Pie>
+
                 <Tooltip
                   contentStyle={{
                     backgroundColor: dark ? "#171b26" : "#ffffff",
-                    color: dark ? "rgba(255,255,255,0.85)" : "#111",
                     borderRadius: "10px",
-                    padding: "8px 14px",
                     border: dark
                       ? "1px solid rgba(255,255,255,0.07)"
                       : "1px solid rgba(0,0,0,0.07)",
                     fontSize: "13px",
                   }}
-                  formatter={(value) => [value, "Tasks"]}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
+
           <CustomLegend data={data} total={total} dark={dark} />
         </div>
       )}
