@@ -1,4 +1,4 @@
-import{t as e}from"./jsx-runtime-C7M7YA1l.js";import{s as t}from"./chunk-QFMPRPBF-DmyzOyiA.js";var n=e();function r({dark:e}){let r=t();return(0,n.jsx)(`div`,{className:`
+import{t as e}from"./jsx-runtime-C7M7YA1l.js";import{s as t}from"./chunk-QFMPRPBF-DCfZhIG8.js";var n=e();function r({dark:e}){let r=t();return(0,n.jsx)(`div`,{className:`
         flex items-center justify-center
         min-h-screen
         p-6

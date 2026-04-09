@@ -1,4 +1,4 @@
-import{t as e}from"./jsx-runtime-C7M7YA1l.js";import{n as t}from"./chunk-QFMPRPBF-DmyzOyiA.js";var n=e();function r(){return(0,n.jsxs)(`div`,{className:`\r
+import{t as e}from"./jsx-runtime-C7M7YA1l.js";import{n as t}from"./chunk-QFMPRPBF-DCfZhIG8.js";var n=e();function r(){return(0,n.jsxs)(`div`,{className:`\r
         min-h-screen\r
         bg-white dark:bg-gray-900\r
         transition\r
